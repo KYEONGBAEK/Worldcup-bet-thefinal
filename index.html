@@ -83,7 +83,7 @@
 
 <header>
 <div class="header-badge">⚽ 2026 FIFA WORLD CUP</div>
-  <p style="font-size:0.9rem;color:#f0c060;margin-bottom:8px;font-weight:700;">🏆 나라감정평가법인 본부장배 월드컵토토</p>
+  <p style="font-size:0.9rem;color:#f0c060;margin-bottom:8px;font-weight:700;">🏆 나라감정평가법인 부산지역본부 월드컵토토</p>
   <h1>
     <div class="title-flags">
       <img src="https://flagcdn.com/w40/kr.png" style="height:1.6em;vertical-align:middle;">
@@ -173,8 +173,13 @@ async function loadBets() {
 function renderGrid() {
   const rows = document.getElementById('gridRows');
   rows.innerHTML = '';
-  let approvedCount = 0;
   let filledCount = 0;
+
+  // 전체 승인자 수 먼저 계산
+  let approvedCount = 0;
+  for (const list of Object.values(bets)) {
+    approvedCount += list.filter(b => b.status === 'approved').length;
+  }
 
   for (let mex = 1; mex <= 5; mex++) {
     const row = document.createElement('div');
