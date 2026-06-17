@@ -181,7 +181,7 @@ function renderGrid() {
   let html = '<thead><tr><th>멕/한</th>';
   for (let k = 1; k <= 5; k++) html += `<th>한국 ${k}골</th>`;
   html += '</tr></thead><tbody>';
-  for (let m = 5; m >= 1; m--) {
+  for (let m = 1; m >= 5; m--) {
     html += `<tr><th>멕시코 ${m}골</th>`;
     for (let k = 1; k <= 5; k++) {
       const key = `${k}-${m}`;
