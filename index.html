@@ -11,19 +11,19 @@
     --bg: #0a2010; --surface: #122a18; --surface2: #1a3a22;
     --border: rgba(255,255,255,0.1); --text: #f0f0f0; --muted: #8ab895;
   }
-  body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic Neo','Noto Sans KR',sans-serif; min-height: 100vh; }
-  header { background: linear-gradient(180deg,#0a1a0a 0%,#0f2a15 100%); border-bottom: 1px solid var(--green); padding: 1.5rem 1rem; text-align: center; }
+  body { background: #0a2010 url('https://raw.githubusercontent.com/KYEONGBAEK/Worldcup-bet/main/Gemini_Generated_Image_6kpqgr6kpqgr6kpq.png') no-repeat center top / cover fixed; color: var(--text); font-family: 'Apple SD Gothic Neo','Noto Sans KR',sans-serif; min-height: 100vh; }
+  header { background: linear-gradient(180deg,rgba(10,26,10,0.85) 0%,rgba(15,42,21,0.85) 100%); backdrop-filter: blur(4px); border-bottom: 1px solid var(--green); padding: 1.5rem 1rem; text-align: center; }
   .header-badge { display: inline-block; background: var(--gold); color: #1a1a1a; font-size: 11px; font-weight: 700; padding: 3px 12px; border-radius: 20px; letter-spacing: 1.5px; margin-bottom: 12px; }
   header h1 { font-size: clamp(1.3rem,4vw,2.2rem); font-weight: 800; line-height: 1.3; }
   .title-flags { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
   .vs-text { background: var(--gold); color: #1a1a1a; font-size: 0.9rem; font-weight: 900; padding: 4px 12px; border-radius: 6px; }
   .subtitle { margin-top: 8px; color: var(--muted); font-size: 0.85rem; }
-  .stats-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem; display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+  .stats-bar { background: rgba(18,42,24,0.8); backdrop-filter: blur(4px); border-bottom: 1px solid var(--border); padding: 1rem; display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
   .stat-item { text-align: center; }
   .stat-value { font-size: 1.4rem; font-weight: 800; color: var(--gold); display: block; }
   .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
-  .notice { background: rgba(240,180,41,0.1); border: 1px solid rgba(240,180,41,0.3); border-radius: 10px; padding: 12px 16px; margin: 1rem; font-size: 0.82rem; color: #f0c060; text-align: center; line-height: 1.6; }
-  .grid-section { padding: 0 1rem 2rem; overflow-x: auto; }
+  .notice { background: rgba(240,180,41,0.15); border: 1px solid rgba(240,180,41,0.3); border-radius: 10px; padding: 12px 16px; margin: 1rem; font-size: 0.82rem; color: #f0c060; text-align: center; line-height: 1.6; }
+  .grid-section { padding: 0 1rem 2rem; background: rgba(0,0,0,0.5); border-radius: 12px; margin: 0 0.5rem; overflow-x: auto; }
   .axis-label-top { text-align: center; margin-bottom: 8px; }
   .eng-label { display: inline-flex; align-items: center; gap: 8px; background: rgba(200,16,46,0.15); border: 1px solid rgba(200,16,46,0.4); border-radius: 8px; padding: 6px 16px; font-size: 0.85rem; font-weight: 700; color: #ff8080; }
   .grid-wrapper { display: flex; align-items: flex-start; }
@@ -34,7 +34,7 @@
   .grid-rows { display: flex; flex-direction: column; gap: 4px; min-width: 360px; }
   .grid-row { display: grid; grid-template-columns: 40px repeat(6,1fr); gap: 4px; }
   .row-header { display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: #74ACDF; background: rgba(116,172,223,0.1); border-radius: 6px; padding: 4px; }
-  .grid-cell { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 6px; cursor: pointer; transition: all 0.2s; min-height: 88px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .grid-cell { background: rgba(18,42,24,0.75); backdrop-filter: blur(2px); border: 1px solid var(--border); border-radius: 10px; padding: 8px 6px; cursor: pointer; transition: all 0.2s; min-height: 88px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
   .grid-cell:hover { border-color: var(--gold); background: var(--surface2); transform: translateY(-1px); }
   .grid-cell.empty-cell .cell-plus { font-size: 1.2rem; color: var(--muted); opacity: 0.5; }
   .grid-cell.has-pending { border-color: rgba(240,180,41,0.5); background: rgba(240,180,41,0.06); }
@@ -73,7 +73,7 @@
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a3a22; border: 1px solid var(--green-light); color: #80e0a0; padding: 12px 20px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; z-index: 200; transition: transform 0.3s ease; white-space: nowrap; }
   .toast.show { transform: translateX(-50%) translateY(0); }
   .toast.error { background: #3a1a1a; border-color: #c0392b; color: #ff8080; }
-  footer { text-align: center; padding: 1.5rem; color: var(--muted); font-size: 0.75rem; border-top: 1px solid var(--border); }
+  footer { text-align: center; padding: 1.5rem; color: var(--muted); font-size: 0.75rem; border-top: 1px solid var(--border); background: rgba(10,26,10,0.85); backdrop-filter: blur(4px); }
   .loading { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.85rem; }
   @media (max-width:480px) { .grid-cell{min-height:72px;padding:6px 4px} .name-badge{font-size:0.65rem} .col-headers,.grid-rows{min-width:300px} }
 </style>
@@ -103,6 +103,10 @@
 
 <div style="background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.4);border-radius:10px;padding:10px 16px;margin:0.5rem 1rem;text-align:center;font-size:0.85rem;color:#ff9090;font-weight:700;">
   🏆 이월상금: 1,100,000원 (전회차 미당첨 이월)
+</div>
+<div class="notice">
+  💰 1인 베팅 금액: <strong>5만원</strong> &nbsp;|&nbsp; 입금 후 관리자 승인 시 확정됩니다<br>
+  🏦 5만원 현금 or 카카오송금 이경백 평가사에게 &nbsp;|&nbsp; 한 사람당 1칸만 신청 가능
 </div>
 
 <div class="legend">
