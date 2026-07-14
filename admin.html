@@ -31,8 +31,8 @@
   .bet-info { flex: 1; min-width: 160px; }
   .bet-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 2px; }
   .bet-score { font-size: 0.8rem; color: var(--muted); }
-  .bet-score .kor { color: #ff9090; }
-  .bet-score .mex { color: #70d090; }
+  .bet-score .eng { color: #ff9090; }
+  .bet-score .arg { color: #74ACDF; }
   .bet-status { font-size: 0.75rem; padding: 3px 10px; border-radius: 20px; font-weight: 700; }
   .status-pending { background: rgba(240,180,41,0.2); color: #f0c060; border: 1px solid rgba(240,180,41,0.35); }
   .status-approved { background: rgba(45,158,74,0.2); color: #70e090; border: 1px solid rgba(45,158,74,0.35); }
@@ -44,7 +44,7 @@
   .btn-revoke { background: rgba(240,180,41,0.15); border: 1px solid rgba(240,180,41,0.4); color: #f0c060; padding: 6px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
   .empty-state { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 2rem; background: var(--surface); border: 1px dashed var(--border); border-radius: 10px; }
   .mini-grid { overflow-x: auto; margin-bottom: 2rem; }
-  table { border-collapse: collapse; width: 100%; min-width: 380px; font-size: 0.78rem; }
+  table { border-collapse: collapse; width: 100%; min-width: 480px; font-size: 0.78rem; }
   th { background: var(--surface2); padding: 8px; text-align: center; border: 1px solid var(--border); color: var(--muted); font-size: 0.72rem; }
   td { border: 1px solid var(--border); padding: 8px; text-align: center; vertical-align: middle; }
   td .approved-name { color: #70e090; display: block; font-weight: 600; }
@@ -68,7 +68,7 @@
 
 <div id="adminScreen">
   <header>
-    <h1>⚽ 월드컵 베팅 관리자</h1>
+    <h1>⚽ 월드컵 베팅 관리자 | 잉글랜드 vs 아르헨티나</h1>
     <button class="logout-btn" onclick="logout()">로그아웃</button>
   </header>
   <div class="admin-content">
@@ -96,16 +96,17 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const ADMIN_PASSWORD = '1234'; // ← 비밀번호 변경하세요
-const SUPABASE_URL = 'https://uknywyszkffaeddnusjx.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVrbnl3eXN6a2ZmYWVkZG51c2p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.HGqPSLeKq6azZ7RM_nfbkJgeslOCcS0ICvFrlPGjq44';
-const BET_AMOUNT = 50000;
+var ADMIN_PASSWORD = '1234';
+var SUPABASE_URL = 'https://uknywyszkffaeddnusjx.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVrbnl3eXN6a2ZmYWVkZG51c2p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.HGqPSLeKq6azZ7RM_nfbkJgeslOCcS0ICvFrlPGjq44';
+var BET_AMOUNT = 50000;
+var ROLLOVER = 1100000;
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-let allBets = [];
+var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var allBets = [];
 
 function login() {
-  const pw = document.getElementById('pwInput').value;
+  var pw = document.getElementById('pwInput').value;
   if (pw === ADMIN_PASSWORD) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminScreen').style.display = 'block';
@@ -123,74 +124,87 @@ function logout() {
 }
 
 async function loadAndRender() {
-  const { data, error } = await supabaseClient.from('bets').select('*').order('created_at', { ascending: true });
-  if (error) { console.error(error); return; }
-  allBets = data;
-  renderAdmin();
+  try {
+    var result = await supabaseClient.from('bets').select('*').order('created_at', { ascending: true });
+    if (result.error) throw result.error;
+    allBets = result.data;
+    renderAdmin();
+  } catch(e) {
+    console.error(e);
+  }
 }
 
 function renderAdmin() {
-  const pending = allBets.filter(b => b.status === 'pending');
-  const approved = allBets.filter(b => b.status === 'approved');
+  var pending = allBets.filter(function(b) { return b.status === 'pending'; });
+  var approved = allBets.filter(function(b) { return b.status === 'approved'; });
+  var totalPool = (approved.length * BET_AMOUNT) + ROLLOVER;
 
   document.getElementById('adm-total').textContent = allBets.length + '명';
   document.getElementById('adm-pending').textContent = pending.length + '명';
   document.getElementById('adm-approved').textContent = approved.length + '명';
-  document.getElementById('adm-pool').textContent = (approved.length * BET_AMOUNT).toLocaleString() + '원';
+  document.getElementById('adm-pool').textContent = totalPool.toLocaleString() + '원';
 
-  const pendingEl = document.getElementById('pendingList');
-  pendingEl.innerHTML = pending.length === 0
-    ? `<div class="empty-state">대기 중인 신청이 없습니다</div>`
-    : pending.map(b => {
-        const [kor, mex] = b.cell_key.split('-');
-        return `<div class="bet-item">
-          <div class="bet-info">
-            <div class="bet-name">${b.name}</div>
-            <div class="bet-score"><span class="kor">🇰🇷 한국 ${kor}골</span> vs <span class="mex">${mex}골 멕시코 🇲🇽</span></div>
-          </div>
-          <span class="bet-status status-pending">대기 중</span>
-          <div class="bet-actions">
-            <button class="btn-approve" onclick="approveBet('${b.id}')">✓ 승인</button>
-            <button class="btn-reject" onclick="rejectBet('${b.id}','${b.name}')">✗ 거절</button>
-          </div>
-        </div>`;
-      }).join('');
+  var pendingEl = document.getElementById('pendingList');
+  if (pending.length === 0) {
+    pendingEl.innerHTML = '<div class="empty-state">대기 중인 신청이 없습니다</div>';
+  } else {
+    pendingEl.innerHTML = pending.map(function(b) {
+      var parts = b.cell_key.split('-');
+      var eng = parts[0];
+      var arg = parts[1];
+      return '<div class="bet-item">' +
+        '<div class="bet-info">' +
+          '<div class="bet-name">' + b.name + '</div>' +
+          '<div class="bet-score"><span class="eng">🏴 잉글랜드 ' + eng + '골</span> vs <span class="arg">' + arg + '골 아르헨티나 🇦🇷</span></div>' +
+        '</div>' +
+        '<span class="bet-status status-pending">대기 중</span>' +
+        '<div class="bet-actions">' +
+          '<button class="btn-approve" onclick="approveBet(\'' + b.id + '\')">✓ 승인</button>' +
+          '<button class="btn-reject" onclick="rejectBet(\'' + b.id + '\',\'' + b.name + '\')">✗ 거절</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
 
-  const approvedEl = document.getElementById('approvedList');
-  approvedEl.innerHTML = approved.length === 0
-    ? `<div class="empty-state">승인된 참가자가 없습니다</div>`
-    : approved.map(b => {
-        const [kor, mex] = b.cell_key.split('-');
-        return `<div class="bet-item">
-          <div class="bet-info">
-            <div class="bet-name">${b.name}</div>
-            <div class="bet-score"><span class="kor">🇰🇷 한국 ${kor}골</span> vs <span class="mex">${mex}골 멕시코 🇲🇽</span></div>
-          </div>
-          <span class="bet-status status-approved">승인 완료</span>
-          <div class="bet-actions">
-            <button class="btn-revoke" onclick="revokeBet('${b.id}','${b.name}')">취소</button>
-          </div>
-        </div>`;
-      }).join('');
+  var approvedEl = document.getElementById('approvedList');
+  if (approved.length === 0) {
+    approvedEl.innerHTML = '<div class="empty-state">승인된 참가자가 없습니다</div>';
+  } else {
+    approvedEl.innerHTML = approved.map(function(b) {
+      var parts = b.cell_key.split('-');
+      var eng = parts[0];
+      var arg = parts[1];
+      return '<div class="bet-item">' +
+        '<div class="bet-info">' +
+          '<div class="bet-name">' + b.name + '</div>' +
+          '<div class="bet-score"><span class="eng">🏴 잉글랜드 ' + eng + '골</span> vs <span class="arg">' + arg + '골 아르헨티나 🇦🇷</span></div>' +
+        '</div>' +
+        '<span class="bet-status status-approved">승인 완료</span>' +
+        '<div class="bet-actions">' +
+          '<button class="btn-revoke" onclick="revokeBet(\'' + b.id + '\',\'' + b.name + '\')">취소</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
 
   renderGrid();
 }
 
 function renderGrid() {
-  const table = document.getElementById('adminGrid');
-  let html = '<thead><tr><th>멕/한</th>';
-  for (let k = 1; k <= 5; k++) html += `<th>한국 ${k}골</th>`;
+  var table = document.getElementById('adminGrid');
+  var html = '<thead><tr><th>아르/잉</th>';
+  for (var k = 0; k <= 5; k++) html += '<th>잉글랜드 ' + k + '골</th>';
   html += '</tr></thead><tbody>';
-  for (let m = 1; m >= 5; m--) {
-    html += `<tr><th>멕시코 ${m}골</th>`;
-    for (let k = 1; k <= 5; k++) {
-      const key = `${k}-${m}`;
-      const list = allBets.filter(b => b.cell_key === key);
-      html += `<td>`;
-      list.filter(b => b.status === 'approved').forEach(b => { html += `<span class="approved-name">✅ ${b.name}</span>`; });
-      list.filter(b => b.status === 'pending').forEach(b => { html += `<span class="pending-name">⏳ ${b.name}</span>`; });
-      if (list.length === 0) html += `<span style="color:#555">-</span>`;
-      html += `</td>`;
+  for (var a = 0; a <= 5; a++) {
+    html += '<tr><th>아르헨티나 ' + a + '골</th>';
+    for (var e = 0; e <= 5; e++) {
+      var key = e + '-' + a;
+      var list = allBets.filter(function(b) { return b.cell_key === key; });
+      html += '<td>';
+      list.filter(function(b) { return b.status === 'approved'; }).forEach(function(b) { html += '<span class="approved-name">✅ ' + b.name + '</span>'; });
+      list.filter(function(b) { return b.status === 'pending'; }).forEach(function(b) { html += '<span class="pending-name">⏳ ' + b.name + '</span>'; });
+      if (list.length === 0) html += '<span style="color:#555">-</span>';
+      html += '</td>';
     }
     html += '</tr>';
   }
@@ -199,41 +213,45 @@ function renderGrid() {
 }
 
 async function approveBet(id) {
-  const { error } = await supabaseClient.from('bets').update({ status: 'approved' }).eq('id', id);
-  if (error) { showToast('오류 발생'); return; }
-  await loadAndRender();
-  const bet = allBets.find(b => b.id === id);
-  showToast(`✅ 승인 완료`);
+  try {
+    var result = await supabaseClient.from('bets').update({ status: 'approved' }).eq('id', id);
+    if (result.error) throw result.error;
+    await loadAndRender();
+    showToast('✅ 승인 완료');
+  } catch(e) { showToast('오류 발생'); }
 }
 
 async function rejectBet(id, name) {
-  if (!confirm(`${name}님의 신청을 거절하시겠습니까?`)) return;
-  const { error } = await supabaseClient.from('bets').delete().eq('id', id);
-  if (error) { showToast('오류 발생'); return; }
-  await loadAndRender();
-  showToast(`${name}님 신청 거절됨`);
+  if (!confirm(name + '님의 신청을 거절하시겠습니까?')) return;
+  try {
+    var result = await supabaseClient.from('bets').delete().eq('id', id);
+    if (result.error) throw result.error;
+    await loadAndRender();
+    showToast(name + '님 신청 거절됨');
+  } catch(e) { showToast('오류 발생'); }
 }
 
 async function revokeBet(id, name) {
-  if (!confirm(`${name}님의 승인을 취소하시겠습니까?`)) return;
-  const { error } = await supabaseClient.from('bets').update({ status: 'pending' }).eq('id', id);
-  if (error) { showToast('오류 발생'); return; }
-  await loadAndRender();
-  showToast(`${name}님 승인 취소됨`);
+  if (!confirm(name + '님의 승인을 취소하시겠습니까?')) return;
+  try {
+    var result = await supabaseClient.from('bets').update({ status: 'pending' }).eq('id', id);
+    if (result.error) throw result.error;
+    await loadAndRender();
+    showToast(name + '님 승인 취소됨');
+  } catch(e) { showToast('오류 발생'); }
 }
 
-// 실시간 구독
 supabaseClient.channel('admin-channel')
-  .on('postgres_changes', { event: '*', schema: 'public', table: 'bets' }, () => {
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'bets' }, function() {
     loadAndRender();
   })
   .subscribe();
 
 function showToast(msg) {
-  const t = document.getElementById('toast');
+  var t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
 }
 </script>
 </body>
