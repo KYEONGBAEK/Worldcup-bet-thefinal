@@ -153,29 +153,79 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
 <script>
 var SUPABASE_URL = 'https://uknywyszkffaeddnusjx.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVrbnl3eXN6a2ZmYWVkZG51c2p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Njk1ODMsImV4cCI6MjA5NzI0NTU4M30.HGqPSLeKq6azZ7RM_nfbkJgeslOCcS0ICvFrlPGjq44';
 var BET_AMOUNT = 1000;
 var ROLLOVER = 0;
 
-var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var supabaseClient = {
+  from: function(table) {
+    var base = SUPABASE_URL + '/rest/v1/' + table;
+    var headers = {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    };
+    return {
+      select: function(cols) {
+        return {
+          then: function() {},
+          catch: function() {},
+          _url: base + '?select=' + (cols || '*'),
+          _headers: headers,
+          exec: async function() {
+            var res = await fetch(base + '?select=' + (cols || '*'), { headers: headers });
+            var data = await res.json();
+            return res.ok ? { data: data, error: null } : { data: null, error: data };
+          }
+        };
+      }
+    };
+  }
+};
+
+async function dbSelect() {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/bets?select=*', {
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+    }
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return await res.json();
+}
+
+async function dbInsert(row) {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/bets', {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    },
+    body: JSON.stringify(row)
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return await res.json();
+}
 var bets = {};
 var selectedCell = null;
 
 async function loadBets() {
   try {
-    var result = await supabaseClient.from('bets').select('*');
-    if (result.error) throw result.error;
+    var data = await dbSelect();
     bets = {};
-    result.data.forEach(function(row) {
+    data.forEach(function(row) {
       if (!bets[row.cell_key]) bets[row.cell_key] = [];
       bets[row.cell_key].push({ id: row.id, name: row.name, status: row.status });
     });
     renderGrid();
   } catch(e) {
-    console.error('loadBets error:', JSON.stringify(e)); document.getElementById('gridRows').innerHTML = '<div class="loading" style="color:#ff8080">데이터 로드 실패. Supabase 연결을 확인해주세요.</div>';
+    console.error('loadBets error:', e.message || e);
+    document.getElementById('gridRows').innerHTML = '<div class="loading" style="color:#ff8080">데이터 로드 실패: ' + (e.message || '연결 오류') + '</div>';
   }
 }
 
@@ -308,12 +358,11 @@ async function submitRequest() {
   try {
     var esp = selectedCell.esp;
     var arg = selectedCell.arg;
-    var result = await supabaseClient.from('bets').insert({
+    await dbInsert({
       cell_key: esp + '-' + arg,
       name: name,
       status: 'pending'
     });
-    if (result.error) throw result.error;
     closeModal();
     await loadBets();
     showToast('✅ ' + name + '님 신청 완료! 관리자 승인을 기다려주세요');
@@ -333,11 +382,8 @@ function showToast(msg, isError) {
   setTimeout(function() { t.classList.remove('show'); }, 3500);
 }
 
-supabaseClient.channel('bets-channel')
-  .on('postgres_changes', { event: '*', schema: 'public', table: 'bets' }, function() {
-    loadBets();
-  })
-  .subscribe();
+// 10초마다 자동 새로고침
+setInterval(loadBets, 10000);
 
 loadBets();
 </script>
